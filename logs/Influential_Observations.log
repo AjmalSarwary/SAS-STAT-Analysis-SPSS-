@@ -1,0 +1,472 @@
+ 
+ 1          OPTIONS NONOTES NOSTIMER NOSOURCE NOSYNTAXCHECK;
+ NOTE: Die Verwendung von ODS-Anweisungen in der SAS Studio-Umgebung kann die Deaktivierung von Ausgabefunktionen zur Folge haben.
+ 73         
+ 74         * This script applies a series of statistical analyses on the 'cas.amesreg300'
+ 75         real estate dataset to derive insights into property sales dynamics.
+ 76         I will conduct regression analyses, diagnostic tests, and various statistical
+ 77         tests to examine assumptions and compare metrics within the dataset;
+ 78         
+ 79         
+ 80         libname cas '/home/u61013211/EST142/data/import';
+ NOTE: Libref CAS 1verweist auf dieselbe physische Bibliothek wie _TEMP0.
+ NOTE: Libref CAS was successfully assigned as follows: 
+       Engine:        V9 
+       Physical Name: /home/u61013211/EST142/data/import
+ 81         
+ 82         ods trace on;
+ 83         options locale=en;
+ 84         /* Initial regression analysis to explore the relationship between SalePrice and predictors */
+ 85         proc reg data=cas.amesreg300 outest=res;
+ NOTE: Data file CAS.AMESREG300.DATA is in a format that is native to another host, or the file encoding does not match the session 
+       encoding. Cross Environment Data Access will be used, which might require additional CPU resources and might reduce 
+       performance.
+ 86          model SalePrice = Gr_Liv_Area Age_at_Sale ;
+ 87          title 'Exploratory Regression Analysis for Sale Price Prediction';
+ 88         run;
+ 
+ 
+ Output Added:
+ -------------
+ Name:       NObs
+ Label:      Number of Observations
+ Template:   Stat.Reg.NObs
+ Path:       Reg.MODEL1.Fit.SalePrice.NObs
+ -------------
+ 
+ Output Added:
+ -------------
+ Name:       ANOVA
+ Label:      Analysis of Variance
+ Template:   Stat.REG.ANOVA
+ Path:       Reg.MODEL1.Fit.SalePrice.ANOVA
+ -------------
+ 
+ Output Added:
+ -------------
+ Name:       FitStatistics
+ Label:      Fit Statistics
+ Template:   Stat.REG.FitStatistics
+ Path:       Reg.MODEL1.Fit.SalePrice.FitStatistics
+ -------------
+ 
+ Output Added:
+ -------------
+ Name:       ParameterEstimates
+ Label:      Parameter Estimates
+ Template:   Stat.REG.ParameterEstimates
+ Path:       Reg.MODEL1.Fit.SalePrice.ParameterEstimates
+ -------------
+ 
+ Output Added:
+ -------------
+ Name:       DiagnosticsPanel
+ Label:      Fit Diagnostics
+ Template:   Stat.REG.Graphics.DiagnosticsPanel
+ Path:       Reg.MODEL1.ObswiseStats.SalePrice.DiagnosticPlots.DiagnosticsPanel
+ -------------
+ 
+ Output Added:
+ -------------
+ Name:       ResidualPlot
+ Label:      Panel 1
+ Template:   Stat.REG.Graphics.ResidualPanel
+ Path:       Reg.MODEL1.ObswiseStats.SalePrice.ResidualPlots.ResidualPlot
+ -------------
+ 89         
+ 90         ods trace on;
+ 91         options locale=en;
+ 92         /* Detailed regression with diagnostics to evaluate the influence of individual data points */
+ 
+ NOTE: The data set WORK.RES has 1 observations and 8 variables.
+ NOTE: PROCEDURE REG used (Total process time):
+       real time           0.90 seconds
+       user cpu time       0.45 seconds
+       system cpu time     0.06 seconds
+       memory              29697.09k
+       OS Memory           58056.00k
+       Timestamp           30.04.2024 06:34:14 nachm.
+       Step Count                        98  Switch Count  26
+       Page Faults                       0
+       Page Reclaims                     18535
+       Page Swaps                        0
+       Voluntary Context Switches        971
+       Involuntary Context Switches      1
+       Block Input Operations            0
+       Block Output Operations           8344
+       
+ 
+ 93         proc reg data=cas.amesreg300 plots(only)=(rstudentbyleverage cooksd dffits dfbetas);
+ NOTE: Data file CAS.AMESREG300.DATA is in a format that is native to another host, or the file encoding does not match the session 
+       encoding. Cross Environment Data Access will be used, which might require additional CPU resources and might reduce 
+       performance.
+ 94          model SalePrice = Gr_Liv_Area Age_at_Sale / influence;
+ 95          output out=diagnostics h=leverage rstudent=rstudent cookd=cooksd dffits=dffits;
+ 96          title 'In-depth Diagnostic Analysis to Identify Influential Observations';
+ 97         run;
+ 
+ 
+ Output Added:
+ -------------
+ Name:       NObs
+ Label:      Number of Observations
+ Template:   Stat.Reg.NObs
+ Path:       Reg.MODEL1.Fit.SalePrice.NObs
+ -------------
+ 
+ Output Added:
+ -------------
+ Name:       ANOVA
+ Label:      Analysis of Variance
+ Template:   Stat.REG.ANOVA
+ Path:       Reg.MODEL1.Fit.SalePrice.ANOVA
+ -------------
+ 
+ Output Added:
+ -------------
+ Name:       FitStatistics
+ Label:      Fit Statistics
+ Template:   Stat.REG.FitStatistics
+ Path:       Reg.MODEL1.Fit.SalePrice.FitStatistics
+ -------------
+ 
+ Output Added:
+ -------------
+ Name:       ParameterEstimates
+ Label:      Parameter Estimates
+ Template:   Stat.REG.ParameterEstimates
+ Path:       Reg.MODEL1.Fit.SalePrice.ParameterEstimates
+ -------------
+ 
+ Output Added:
+ -------------
+ Name:       OutputStatistics
+ Label:      Output Statistics
+ Template:   Stat.Reg.OutputStatistics
+ Path:       Reg.MODEL1.ObswiseStats.SalePrice.OutputStatistics
+ -------------
+ 
+ Output Added:
+ -------------
+ Name:       ResidualStatistics
+ Label:      Residual Statistics
+ Template:   Stat.Reg.ResidualStatistics
+ Path:       Reg.MODEL1.ObswiseStats.SalePrice.ResidualStatistics
+ -------------
+ 
+ Output Added:
+ -------------
+ Name:       CooksDPlot
+ Label:      Cook's D
+ Template:   Stat.REG.Graphics.CooksD
+ Path:       Reg.MODEL1.ObswiseStats.SalePrice.DiagnosticPlots.CooksDPlot
+ -------------
+ 
+ Output Added:
+ -------------
+ Name:       RStudentByLeverage
+ Label:      RStudent by Leverage
+ Template:   Stat.REG.Graphics.RStudentByLeverage
+ Path:       Reg.MODEL1.ObswiseStats.SalePrice.DiagnosticPlots.RStudentByLeverage
+ -------------
+ 
+ Output Added:
+ -------------
+ Name:       DFFITSPlot
+ Label:      DFFITS Plot
+ Template:   Stat.REG.Graphics.DFFITSPlot
+ Path:       Reg.MODEL1.ObswiseStats.SalePrice.DFFITSPlot
+ -------------
+ 
+ Output Added:
+ -------------
+ Name:       DFBETASPanel
+ Label:      Panel 1
+ Template:   Stat.REG.Graphics.DFBETASPanel
+ Path:       Reg.MODEL1.ObswiseStats.SalePrice.DFBetasPlots.DFBETASPanel
+ -------------
+ 98         
+ 99         ods trace on;
+ 100        options locale=en;
+ 101        /* Data preparation for flagging influential cases based on diagnostics */
+ 102        *Observations with higher values of Cook’s D, DFFITS, thus high flag counts, would be key candidates
+ 103        for further scrutiny. They might be leverage points, outliers, or both, and could unduly influence
+ 104        the model's predictions.
+ 105        If and when influential points are found, performing a sensitivity analysis by recalculating the main statistics or
+ 106        redoing key tests with and without these influential points may be warranted;
+ 
+ NOTE: The data set WORK.DIAGNOSTICS has 300 observations and 107 variables.
+ NOTE: PROCEDURE REG used (Total process time):
+       real time           1.10 seconds
+       user cpu time       0.74 seconds
+       system cpu time     0.04 seconds
+       memory              13776.00k
+       OS Memory           67048.00k
+       Timestamp           30.04.2024 06:34:15 nachm.
+       Step Count                        99  Switch Count  8
+       Page Faults                       0
+       Page Reclaims                     4683
+       Page Swaps                        0
+       Voluntary Context Switches        1442
+       Involuntary Context Switches      1
+       Block Input Operations            0
+       Block Output Operations           5672
+       
+ 
+ 107        data review2;
+ 108         set diagnostics;
+ 109         flag=0;
+ 110         n=300; /* Total observations */
+ 111         k=2; /* Number of predictors */
+ 112         cooksd_cut = 4/n; /* Cook's distance cutoff */
+ 113         h_cut=2*(k+1)/n; /* Leverage cutoff */
+ 114         dffits_cut=2*sqrt((k+1)/n); /* DFFITS cutoff */
+ 115         if cooksd > cooksd_cut then flag+1;
+ 116         if abs(dffits) > dffits_cut then flag+1;
+ 117         if flag>0;
+ 118         title 'Flagging Influential Observations for Review';
+ 119        run;
+ 
+ NOTE: There were 300 observations read from the data set WORK.DIAGNOSTICS.
+ NOTE: The data set WORK.REVIEW2 has 15 observations and 113 variables.
+ NOTE: DATA statement used (Total process time):
+       real time           0.00 seconds
+       user cpu time       0.00 seconds
+       system cpu time     0.00 seconds
+       memory              1416.59k
+       OS Memory           60336.00k
+       Timestamp           30.04.2024 06:34:15 nachm.
+       Step Count                        100  Switch Count  3
+       Page Faults                       0
+       Page Reclaims                     134
+       Page Swaps                        0
+       Voluntary Context Switches        21
+       Involuntary Context Switches      0
+       Block Input Operations            0
+       Block Output Operations           264
+       
+ 
+ 120        
+ 121        ods trace on;
+ 122        options locale=en;
+ 123        /* Sorting and printing the flagged data for review */
+ 124        proc sort data=review2;
+ 125         by cooksd;
+ 126        run;
+ 
+ NOTE: There were 15 observations read from the data set WORK.REVIEW2.
+ NOTE: The data set WORK.REVIEW2 has 15 observations and 113 variables.
+ NOTE: PROCEDURE SORT used (Total process time):
+       real time           0.00 seconds
+       user cpu time       0.00 seconds
+       system cpu time     0.00 seconds
+       memory              1105.21k
+       OS Memory           60336.00k
+       Timestamp           30.04.2024 06:34:15 nachm.
+       Step Count                        101  Switch Count  2
+       Page Faults                       0
+       Page Reclaims                     115
+       Page Swaps                        0
+       Voluntary Context Switches        15
+       Involuntary Context Switches      0
+       Block Input Operations            0
+       Block Output Operations           264
+       
+ 
+ 127        
+ 128        ods trace on;
+ 129        options locale=en;
+ 130        proc print data=review2;
+ 131         var SalePrice Gr_Liv_Area Age_at_Sale leverage rstudent cooksd dffits flag;
+ 132         title 'List of Flagged Influential Observations';
+ 133        run;
+ 
+ 
+ Output Added:
+ -------------
+ Name:       Print
+ Label:      Data Set WORK.REVIEW2
+ Data Name:  ProcPrintTable
+ Path:       Print.Print
+ -------------
+ NOTE: There were 15 observations read from the data set WORK.REVIEW2.
+ NOTE: PROCEDURE PRINT used (Total process time):
+       real time           0.03 seconds
+       user cpu time       0.03 seconds
+       system cpu time     0.00 seconds
+       memory              923.87k
+       OS Memory           60336.00k
+       Timestamp           30.04.2024 06:34:15 nachm.
+       Step Count                        102  Switch Count  1
+       Page Faults                       0
+       Page Reclaims                     123
+       Page Swaps                        0
+       Voluntary Context Switches        8
+       Involuntary Context Switches      1
+       Block Input Operations            0
+       Block Output Operations           48
+       
+ 
+ 134        
+ 135        *Conducting tests to ensure model assumptions are met;
+ 136        
+ 137        ods trace on;
+ 138        options locale=en;
+ 139        /* Performing a normality test using the Kolmogorov-Smirnov test */
+ 140        proc univariate data=cas.amesreg300 normal;
+ NOTE: Data file CAS.AMESREG300.DATA is in a format that is native to another host, or the file encoding does not match the session 
+       encoding. Cross Environment Data Access will be used, which might require additional CPU resources and might reduce 
+       performance.
+ 141         var Gr_Liv_Area;
+ 142         title 'Kolmogorov-Smirnov Test of Normality for Living Area';
+ 143        run;
+ 
+ 
+ Output Added:
+ -------------
+ Name:       Moments
+ Label:      Moments
+ Template:   base.univariate.Moments
+ Path:       Univariate.Gr_Liv_Area.Moments
+ -------------
+ 
+ Output Added:
+ -------------
+ Name:       BasicMeasures
+ Label:      Basic Measures of Location and Variability
+ Template:   base.univariate.Measures
+ Path:       Univariate.Gr_Liv_Area.BasicMeasures
+ -------------
+ 
+ Output Added:
+ -------------
+ Name:       TestsForLocation
+ Label:      Tests For Location
+ Template:   base.univariate.Location
+ Path:       Univariate.Gr_Liv_Area.TestsForLocation
+ -------------
+ 
+ Output Added:
+ -------------
+ Name:       TestsForNormality
+ Label:      Tests For Normality
+ Template:   base.univariate.Normal
+ Path:       Univariate.Gr_Liv_Area.TestsForNormality
+ -------------
+ 
+ Output Added:
+ -------------
+ Name:       Quantiles
+ Label:      Quantiles
+ Template:   base.univariate.Quantiles
+ Path:       Univariate.Gr_Liv_Area.Quantiles
+ -------------
+ 
+ Output Added:
+ -------------
+ Name:       ExtremeObs
+ Label:      Extreme Observations
+ Template:   base.univariate.ExtObs
+ Path:       Univariate.Gr_Liv_Area.ExtremeObs
+ -------------
+ NOTE: PROCEDURE UNIVARIATE used (Total process time):
+       real time           0.05 seconds
+       user cpu time       0.06 seconds
+       system cpu time     0.00 seconds
+       memory              1224.59k
+       OS Memory           60336.00k
+       Timestamp           30.04.2024 06:34:15 nachm.
+       Step Count                        103  Switch Count  1
+       Page Faults                       0
+       Page Reclaims                     99
+       Page Swaps                        0
+       Voluntary Context Switches        11
+       Involuntary Context Switches      0
+       Block Input Operations            0
+       Block Output Operations           16
+       
+ 
+ 144        
+ 145        ods trace on;
+ 146        options locale=en;
+ 147        /* Conducting an independent samples t-test to compare Gr_Liv_Area by Sale Condition */
+ 148        proc ttest data=cas.amesreg300 alpha=.05;
+ NOTE: Data file CAS.AMESREG300.DATA is in a format that is native to another host, or the file encoding does not match the session 
+       encoding. Cross Environment Data Access will be used, which might require additional CPU resources and might reduce 
+       performance.
+ 149         class Sale_Condition;
+ 150         var Gr_Liv_Area;
+ 151         title 'Independent Samples t-Test for Living Area by Sale Condition';
+ 152        run;
+ 
+ 
+ Output Added:
+ -------------
+ Name:       Statistics
+ Label:      Statistics
+ Template:   Stat.TTest.Statistics
+ Path:       Ttest.Gr_Liv_Area.Statistics
+ -------------
+ 
+ Output Added:
+ -------------
+ Name:       ConfLimits
+ Label:      Confidence Limits
+ Template:   Stat.TTest.ConfLimits
+ Path:       Ttest.Gr_Liv_Area.ConfLimits
+ -------------
+ 
+ Output Added:
+ -------------
+ Name:       TTests
+ Label:      T-Tests
+ Template:   Stat.TTest.TTests
+ Path:       Ttest.Gr_Liv_Area.TTests
+ -------------
+ 
+ Output Added:
+ -------------
+ Name:       Equality
+ Label:      Equality of Variances
+ Template:   Stat.TTest.Equality
+ Path:       Ttest.Gr_Liv_Area.Equality
+ -------------
+ 
+ Output Added:
+ -------------
+ Name:       SummaryPanel
+ Label:      Summary Panel
+ Template:   Stat.TTest.Graphics.Summary2
+ Path:       Ttest.Gr_Liv_Area.SummaryPanel
+ -------------
+ 
+ Output Added:
+ -------------
+ Name:       QQPlot
+ Label:      Q-Q Plots
+ Template:   Stat.TTest.Graphics.QQ2
+ Path:       Ttest.Gr_Liv_Area.QQPlot
+ -------------
+ NOTE: PROCEDURE TTEST used (Total process time):
+       real time           0.53 seconds
+       user cpu time       0.25 seconds
+       system cpu time     0.07 seconds
+       memory              10173.37k
+       OS Memory           66264.00k
+       Timestamp           30.04.2024 06:34:16 nachm.
+       Step Count                        104  Switch Count  49
+       Page Faults                       0
+       Page Reclaims                     26089
+       Page Swaps                        0
+       Voluntary Context Switches        1300
+       Involuntary Context Switches      0
+       Block Input Operations            0
+       Block Output Operations           3656
+       
+ 
+ 153        
+ 154        
+ 155        
+ 156        
+ 157        OPTIONS NONOTES NOSTIMER NOSOURCE NOSYNTAXCHECK;
+ 169        
