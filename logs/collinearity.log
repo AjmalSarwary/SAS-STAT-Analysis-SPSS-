@@ -1,0 +1,314 @@
+ 
+ 1          OPTIONS NONOTES NOSTIMER NOSOURCE NOSYNTAXCHECK;
+ NOTE: Die Verwendung von ODS-Anweisungen in der SAS Studio-Umgebung kann die Deaktivierung von Ausgabefunktionen zur Folge haben.
+ 73         
+ 74         /***************************************************************************************************
+ 75         * Filename: Collinearity.sas
+ 76         * Purpose: This SAS script is designed to conduct a detailed collinearity diagnostic analysis on the
+ 77         *          'amesreg300' dataset. The aim is to identify and quantify the degree of multicollinearity
+ 78         *          among several predictors of SalePrice.
+ 79         *
+ 80         *          The analysis proceeds through several stages:
+ 81         *          1. Initial exploration of correlations using the SCORR2 option to detect high pairwise correlations.
+ 82         *          2. Further diagnostics employing VIF, collin, and collinoint options to assess the impact
+ 83         *             of collinearity on the regression coefficients and to explore potential redundancy among predictors.
+ 84         *          3. Comprehensive assessment across different models to ensure robustness and reliability of the
+ 85         *             model findings.
+ 86         *
+ 87         *          Each step is designed to enhance understanding of the dataset’s dynamics and to support robust
+ 88         *          model building by ensuring the predictors used do not unduly influence each other.
+ 89         *
+ 90         * Author: Ajmal Sarwary
+ 91         * Date:   30.11.2023
+ 92         ***************************************************************************************************/
+ 93         
+ 94         
+ 95         libname sasba '/home/u61013211/EST142/data/import';
+ NOTE: Libref SASBA 1verweist auf dieselbe physische Bibliothek wie _TEMP0.
+ NOTE: Libref SASBA was successfully assigned as follows: 
+       Engine:        V9 
+       Physical Name: /home/u61013211/EST142/data/import
+ 96         
+ 97         /* Data preparation and cofigs*/
+ 98         
+ 99         data amesreg300;
+ 100            set sasba.amesreg300;
+ NOTE: Datei SASBA.AMESREG300.DATA besitzt das systemeigene Format eines anderen Host, oder die Dateicodierung entspricht nicht der 
+       Sitzungscodierung. Cross Environment Data Access wird verwendet. Dies kann weitere CPU-Ressourcen erfordern und die 
+       Performance wird beeinträchtigt.
+ 101        run;
+ 
+ NOTE: There were 300 observations read from the data set SASBA.AMESREG300.
+ NOTE: The data set WORK.AMESREG300 has 300 observations and 103 variables.
+ NOTE:  Verwendet wurde: DATA statement - (Gesamtverarbeitungszeit):
+       real time           0.00 seconds
+       user cpu time       0.00 seconds
+       system cpu time     0.00 seconds
+       memory              1596.12k
+       OS Memory           33452.00k
+       Timestamp           01.05.2024 12:39:55 nachm.
+       Step Count                        33  Switch Count  2
+       Page Faults                       0
+       Page Reclaims                     300
+       Page Swaps                        0
+       Voluntary Context Switches        16
+       Involuntary Context Switches      0
+       Block Input Operations            0
+       Block Output Operations           520
+       
+ 
+ 102        
+ 103        ods trace on;
+ 104        
+ 105        
+ 106        /* Initial regression analysis with collinearity diagnostics */
+ 107        /* I perform this regression analysis to identify potential multicollinearity among predictors. The 'scorr2' option
+ 107      ! computes the squared correlations among the predictors,
+ 108           highlighting which variables are highly correlated and might affect the stability and interpretability of the
+ 108      ! regression model due to multicollinearity. */
+ 109        options locale=en;
+ 110        proc reg data=amesreg300;
+ 111            model SalePrice = Gr_Liv_Area Fullbath_2plus Total_Bsmt_SF Age_at_Sale Open_Porch_SF Garage_Area / scorr2;
+ 112            title 'Regression Analysis with Standardized Collinearity Diagnostics';
+ 113        run;
+ 
+ 
+ Output Added:
+ -------------
+ Name:       NObs
+ Label:      Number of Observations
+ Template:   Stat.Reg.NObs
+ Path:       Reg.MODEL1.Fit.SalePrice.NObs
+ -------------
+ 
+ Output Added:
+ -------------
+ Name:       ANOVA
+ Label:      Analysis of Variance
+ Template:   Stat.REG.ANOVA
+ Path:       Reg.MODEL1.Fit.SalePrice.ANOVA
+ -------------
+ 
+ Output Added:
+ -------------
+ Name:       FitStatistics
+ Label:      Fit Statistics
+ Template:   Stat.REG.FitStatistics
+ Path:       Reg.MODEL1.Fit.SalePrice.FitStatistics
+ -------------
+ 
+ Output Added:
+ -------------
+ Name:       ParameterEstimates
+ Label:      Parameter Estimates
+ Template:   Stat.REG.ParameterEstimates
+ Path:       Reg.MODEL1.Fit.SalePrice.ParameterEstimates
+ -------------
+ 
+ Output Added:
+ -------------
+ Name:       DiagnosticsPanel
+ Label:      Fit Diagnostics
+ Template:   Stat.REG.Graphics.DiagnosticsPanel
+ Path:       Reg.MODEL1.ObswiseStats.SalePrice.DiagnosticPlots.DiagnosticsPanel
+ -------------
+ 
+ Output Added:
+ -------------
+ Name:       ResidualPlot
+ Label:      Panel 1
+ Template:   Stat.REG.Graphics.ResidualPanel
+ Path:       Reg.MODEL1.ObswiseStats.SalePrice.ResidualPlots.ResidualPlot
+ -------------
+ 114        
+ 115        
+ 116        /* Separate regression model to assess additional multicollinearity diagnostics */
+ 117        /* In this model, I use 'vif' to calculate the Variance Inflation Factor, 'collin' to check for collinearity diagnostics,
+ 117      !  and 'collinoint' to provide collinearity diagnostics including interaction terms.
+ 118           These measures help identify not just multicollinearity but also the specific impact of each predictor in the presence
+ 118      !  of others, highlighting potential redundancy. */
+ 119        options locale=en;
+ 
+ NOTE: PROCEDURE REG used (Total process time):
+       real time           1.04 seconds
+       user cpu time       0.51 seconds
+       system cpu time     0.08 seconds
+       memory              29796.93k
+       OS Memory           58052.00k
+       Timestamp           01.05.2024 12:39:56 nachm.
+       Step Count                        34  Switch Count  24
+       Page Faults                       0
+       Page Reclaims                     18523
+       Page Swaps                        0
+       Voluntary Context Switches        1034
+       Involuntary Context Switches      1
+       Block Input Operations            0
+       Block Output Operations           10400
+       
+ 
+ 120        proc reg data=sasba.ameshousing;
+ NOTE: Data file SASBA.AMESHOUSING.DATA is in a format that is native to another host, or the file encoding does not match the 
+       session encoding. Cross Environment Data Access will be used, which might require additional CPU resources and might reduce 
+       performance.
+ 121            model SalePrice = Gr_Liv_Area Total_Bsmt_SF Lot_Area / vif collin collinoint;
+ 122            title 'Detailed Collinearity Diagnostics on Key Housing Factors';
+ 123        run;
+ 
+ 
+ Output Added:
+ -------------
+ Name:       NObs
+ Label:      Number of Observations
+ Template:   Stat.Reg.NObs
+ Path:       Reg.MODEL1.Fit.SalePrice.NObs
+ -------------
+ 
+ Output Added:
+ -------------
+ Name:       ANOVA
+ Label:      Analysis of Variance
+ Template:   Stat.REG.ANOVA
+ Path:       Reg.MODEL1.Fit.SalePrice.ANOVA
+ -------------
+ 
+ Output Added:
+ -------------
+ Name:       FitStatistics
+ Label:      Fit Statistics
+ Template:   Stat.REG.FitStatistics
+ Path:       Reg.MODEL1.Fit.SalePrice.FitStatistics
+ -------------
+ 
+ Output Added:
+ -------------
+ Name:       ParameterEstimates
+ Label:      Parameter Estimates
+ Template:   Stat.REG.ParameterEstimates
+ Path:       Reg.MODEL1.Fit.SalePrice.ParameterEstimates
+ -------------
+ 
+ Output Added:
+ -------------
+ Name:       CollinDiag
+ Label:      Collinearity Diagnostics
+ Template:   Stat.REG.CollinDiag
+ Path:       Reg.MODEL1.Fit.SalePrice.CollinDiag
+ -------------
+ 
+ Output Added:
+ -------------
+ Name:       CollinDiagNoInt
+ Label:      Intercept-Adjusted Collinearity Diagnostics
+ Template:   Stat.REG.CollinDiag
+ Path:       Reg.MODEL1.Fit.SalePrice.CollinDiagNoInt
+ -------------
+ 
+ Output Added:
+ -------------
+ Name:       DiagnosticsPanel
+ Label:      Fit Diagnostics
+ Template:   Stat.REG.Graphics.DiagnosticsPanel
+ Path:       Reg.MODEL1.ObswiseStats.SalePrice.DiagnosticPlots.DiagnosticsPanel
+ -------------
+ 
+ Output Added:
+ -------------
+ Name:       ResidualPlot
+ Label:      Panel 1
+ Template:   Stat.REG.Graphics.ResidualPanel
+ Path:       Reg.MODEL1.ObswiseStats.SalePrice.ResidualPlots.ResidualPlot
+ -------------
+ 124        
+ 125        
+ 126        /* Further detailed analysis with additional multicollinearity diagnostics on an extended subset of predictors */
+ 127        /* This comprehensive assessment uses 'collinoint' and 'vif' to rigorously evaluate how much predictors inflate the
+ 127      ! variance of estimated regression coefficients.
+ 128           It ensures the robustness of the model by confirming that predictors do not unduly influence each other, maintaining
+ 128      ! the model’s credibility and reliability. */
+ 129        options locale=en;
+ 
+ NOTE: PROCEDURE REG used (Total process time):
+       real time           2.50 seconds
+       user cpu time       1.61 seconds
+       system cpu time     0.10 seconds
+       memory              19111.71k
+       OS Memory           69868.00k
+       Timestamp           01.05.2024 12:39:58 nachm.
+       Step Count                        35  Switch Count  36
+       Page Faults                       0
+       Page Reclaims                     19757
+       Page Swaps                        0
+       Voluntary Context Switches        1328
+       Involuntary Context Switches      2
+       Block Input Operations            0
+       Block Output Operations           44048
+       
+ 
+ 130        proc reg data=sasba.amesreg300;
+ NOTE: Data file SASBA.AMESREG300.DATA is in a format that is native to another host, or the file encoding does not match the 
+       session encoding. Cross Environment Data Access will be used, which might require additional CPU resources and might reduce 
+       performance.
+ 131            model SalePrice = Gr_Liv_Area Total_Bsmt_SF Lot_Area Age_at_Sale / collinoint vif;
+ 132            title 'Comprehensive Collinearity Assessment for Selected Variables';
+ 133        run;
+ 
+ 
+ Output Added:
+ -------------
+ Name:       NObs
+ Label:      Number of Observations
+ Template:   Stat.Reg.NObs
+ Path:       Reg.MODEL1.Fit.SalePrice.NObs
+ -------------
+ 
+ Output Added:
+ -------------
+ Name:       ANOVA
+ Label:      Analysis of Variance
+ Template:   Stat.REG.ANOVA
+ Path:       Reg.MODEL1.Fit.SalePrice.ANOVA
+ -------------
+ 
+ Output Added:
+ -------------
+ Name:       FitStatistics
+ Label:      Fit Statistics
+ Template:   Stat.REG.FitStatistics
+ Path:       Reg.MODEL1.Fit.SalePrice.FitStatistics
+ -------------
+ 
+ Output Added:
+ -------------
+ Name:       ParameterEstimates
+ Label:      Parameter Estimates
+ Template:   Stat.REG.ParameterEstimates
+ Path:       Reg.MODEL1.Fit.SalePrice.ParameterEstimates
+ -------------
+ 
+ Output Added:
+ -------------
+ Name:       CollinDiagNoInt
+ Label:      Intercept-Adjusted Collinearity Diagnostics
+ Template:   Stat.REG.CollinDiag
+ Path:       Reg.MODEL1.Fit.SalePrice.CollinDiagNoInt
+ -------------
+ 
+ Output Added:
+ -------------
+ Name:       DiagnosticsPanel
+ Label:      Fit Diagnostics
+ Template:   Stat.REG.Graphics.DiagnosticsPanel
+ Path:       Reg.MODEL1.ObswiseStats.SalePrice.DiagnosticPlots.DiagnosticsPanel
+ -------------
+ 
+ Output Added:
+ -------------
+ Name:       ResidualPlot
+ Label:      Panel 1
+ Template:   Stat.REG.Graphics.ResidualPanel
+ Path:       Reg.MODEL1.ObswiseStats.SalePrice.ResidualPlots.ResidualPlot
+ -------------
+ 134        
+ 135        
+ 136        OPTIONS NONOTES NOSTIMER NOSOURCE NOSYNTAXCHECK;
+ 148        

@@ -1,7 +1,28 @@
-* This script applies a series of statistical analyses on the 'cas.amesreg300' 
-real estate dataset to derive insights into property sales dynamics.
-I will conduct regression analyses, diagnostic tests, and various statistical 
-tests to examine assumptions and compare metrics within the dataset;
+/***************************************************************************************************
+* Filename: Influential_Observations.sas
+* Purpose: This script is dedicated to performing a detailed analysis of the 'cas.amesreg300' 
+*          real estate dataset to derive insights into property sales dynamics. The aim is to 
+*          understand the relationship between sale price and various property attributes and 
+*          to identify any influential observations that may skew the analysis.
+*
+*          The script will:
+*          1. Conduct an initial regression analysis to explore relationships between SalePrice and 
+*             selected predictors such as Gr_Liv_Area and Age_at_Sale.
+*          2. Perform in-depth diagnostics to evaluate the influence of individual data points on
+*             the regression results using measures like Cook’s D and DFFITS.
+*          3. Prepare data for flagging influential cases based on the diagnostics to identify potential 
+*             outliers or leverage points that could unduly influence the model's predictions.
+*          4. Execute further tests to ensure the robustness of model assumptions, including normality tests 
+*             and independent samples t-tests.
+*
+*          Each analytical step is designed to bolster the integrity of the model and enhance the 
+*          reliability of insights derived from the data, thereby supporting informed model-building for  
+*          decision-making in real estate markets.
+*
+* Author: Ajmal Sarwary
+* Date:	  18.10.2023
+***************************************************************************************************/
+
 
 
 libname cas '/home/u61013211/EST142/data/import';
